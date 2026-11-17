@@ -1,0 +1,10 @@
+{
+  "name": "v-symbol-vpn",
+  "version": "1.0.0",
+  "description": "V-Symbol VPN API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "private": true
+}

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V-Symbol VPN</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #080b16;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  max-width: 430px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 25px 20px;
+  background: radial-gradient(circle at top, #28134d, #080b16 65%);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: #a77aff;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 45px;
+}
+
+.sub {
+  text-align: center;
+  color: #aaa;
+}
+
+button {
+  cursor: pointer;
+}
+
+.power {
+  display: block;
+  width: 155px;
+  height: 155px;
+  margin: 45px auto;
+  border-radius: 50%;
+  border: 5px solid #853bfa;
+  background: #171326;
+  color: white;
+  font-size: 50px;
+  box-shadow: 0 0 35px #7135df;
+}
+
+.power.active {
+  border-color: #35d6a0;
+}
+
+.panel, .country, .stat {
+  background: #191c2a;
+  padding: 18px;
+  border-radius: 14px;
+  margin: 12px 0;
+}
+
+.country {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.country button {
+  background: #713bea;
+  color: white;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 20px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat strong {
+  display: block;
+  color: #a77aff;
+  font-size: 22px;
+}
+
+small {
+  color: #999;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  padding: 18px 5px;
+  background: #171326;
+  border-radius: 16px;
+  margin-top: 30px;
+  position: sticky;
+  bottom: 0;
+}
+
+nav button {
+  background: none;
+  border: 0;
+  color: #aaa;
+}
+
+nav button.selected {
+  color: #a77aff;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.show {
+  display: block;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">V-SYMBOL</div>
+  <small>● VPN PROJECT</small>
+</header>
+
+<section id="home" class="screen show">
+
+<h1 id="status">Not Protected</h1>
+<p class="sub" id="description">
+Your connection is not protected
+</p>
+
+<button class="power" id="power" onclick="toggleVPN()">⏻</button>
+
+<div class="panel">
+  <small>SELECTED LOCATION</small>
+  <h2 id="selected">🇵🇱 Poland</h2>
+  <small id="server">Server: Warsaw</small>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <strong>--</strong>
+    Download
+  </div>
+  <div class="stat">
+    <strong>--</strong>
+    Upload
+  </div>
+</div>
+
+</section>
+
+<section id="countries" class="screen">
+
+<h1>Countries</h1>
+<p class="sub">Choose your location</p>
+<div id="list"></div>
+
+</section>
+
+<section id="statistics" class="screen">
+
+<h1>Statistics</h1>
+<p class="sub">Connection information</p>
+
+<div class="panel">
+  <small>CONNECTION STATUS</small>
+  <h2 id="statStatus">Disconnected</h2>
+</div>
+
+<div class="stats">
+  <div class="stat"><strong>--</strong>Download</div>
+  <div class="stat"><strong>--</strong>Upload</div>
+  <div class="stat"><strong>--</strong>Ping</div>
+  <div class="stat"><strong>--</strong>Server load</div>
+</div>
+
+</section>
+
+<nav>
+<button class="selected" onclick="showScreen('home',this)">Home</button>
+<button onclick="showScreen('countries',this)">Countries</button>
+<button onclick="showScreen('statistics',this)">Statistics</button>
+</nav>
+
+</div>
+
+<script>
+var connected = false;
+
+var countries = [
+["🇵🇱 Poland","Warsaw"],
+["🇩🇪 Germany","Berlin"],
+["🇳🇱 Netherlands","Amsterdam"],
+["🇺🇸 USA","New York"],
+["🇫🇷 France","Paris"],
+["🇬🇧 United Kingdom","London"]
+];
+
+function showScreen(id,button) {
+  document.querySelectorAll(".screen").forEach(function(s) {
+    s.classList.remove("show");
+  });
+
+  document.getElementById(id).classList.add("show");
+
+  document.querySelectorAll("nav button").forEach(function(b) {
+    b.classList.remove("selected");
+  });
+
+  button.classList.add("selected");
+}
+
+function toggleVPN() {
+  connected = !connected;
+  document.getElementById("power").classList.toggle("active",connected);
+
+  document.getElementById("status").textContent =
+    connected ? "Demo Connected" : "Not Protected";
+
+  document.getElementById("description").textContent =
+    connected ? "Demo mode only" : "Your connection is not protected";
+
+  document.getElementById("statStatus").textContent =
+    connected ? "Demo connected" : "Disconnected";
+}
+
+function chooseCountry(country,server) {
+  document.getElementById("selected").textContent = country;
+  document.getElementById("server").textContent = "Server: " + server;
+
+  showScreen("home",document.querySelector("nav button"));
+}
+
+var list = document.getElementById("list");
+
+countries.forEach(function(c) {
+  var div = document.createElement("div");
+  div.className = "country";
+
+  var name = document.createElement("span");
+  name.textContent = c[0];
+
+  var btn = document.createElement("button");
+  btn.textContent = "Select";
+
+  btn.onclick = function() {
+    chooseCountry(c[0],c[1]);
+  };
+
+  div.appendChild(name);
+  div.appendChild(btn);
+  list.appendChild(div);
+});
+</script>
+
+</body>
+</html>
